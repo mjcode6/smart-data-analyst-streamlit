@@ -5,7 +5,8 @@ import streamlit as st
 import pandas as pd
 import io               # used to capture df.info()
 import utils            # placeholder for future (Day 2)
-
+import matplotlib.pyplot as plt
+import seaborn as sns
 # -------------------------
 # 2️⃣ App title
 # -------------------------
@@ -63,3 +64,27 @@ if file is not None:
 
     st.subheader("After Cleaning")
     st.write(df_clean)
+
+# Day 3: Data Visualization with Pandas + Streamlit
+    st.subheader("Numeric Column Distribution")
+    column = st.selectbox("Choose column", df.select_dtypes(include='number').columns)
+
+    st.bar_chart(df[column].value_counts())
+
+
+    # Step 2: Add basic insights
+    st.subheader("QuickInsights")
+    st.write("shape of the data: ", df.shape)
+    st.write("missing values:")
+    st.write(df.isnull().sum())
+
+# Step 3: Add correlation (important DS skill)
+  
+    st.subheader("Correlation Heatmap")
+
+    corr = df.corr(numeric_only=True)
+
+    fig, ax = plt.subplots()
+    sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax)
+
+    st.pyplot(fig)
