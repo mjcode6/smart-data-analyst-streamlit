@@ -3,154 +3,144 @@
 # -------------------------
 import streamlit as st
 import pandas as pd
-import io               # used to capture df.info()
-import utils            # placeholder for future (Day 2)
+import io
+import utils
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 # -------------------------
-# 2️⃣ App title
+# 2️⃣ App Title
 # -------------------------
-st.title("AI Data Analyst")
+st.title("📊 AI Data Analyst")
+st.markdown("Upload your dataset and get simple, human-friendly insights.")
 
 # -------------------------
 # 3️⃣ File uploader
 # -------------------------
-file = st.file_uploader("Upload your CSV file")
+file = st.file_uploader("📁 Upload your CSV file")
 
 # -------------------------
-# 4️⃣ If file is uploaded
+# 4️⃣ If file uploaded
 # -------------------------
 if file is not None:
 
-    # Read CSV
     df = pd.read_csv(file)
 
     # -------------------------
-    # Preview data
+    # 📌 DATA OVERVIEW
     # -------------------------
-    st.subheader("Preview of your data")
-    st.write(df.head())
+    st.divider()
+    st.subheader("📌 Data Overview")
 
-    # -------------------------
-    # Data info (FIXED ✅)
-    # -------------------------
-    st.subheader("Basic info about the data")
-    st.text("Columns, non-null counts, and data types")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Rows", df.shape[0])
+    with col2:
+        st.metric("Columns", df.shape[1])
 
-    buffer = io.StringIO()       # create memory buffer
-    df.info(buf=buffer)          # send info to buffer
-    info_str = buffer.getvalue() # get text from buffer
-
-    st.text(info_str)            # display in app
+    st.write("Preview of your data:")
+    st.dataframe(df.head())
 
     # -------------------------
-    # Descriptive stats
+    # 🧹 CLEANING
     # -------------------------
-    st.subheader("Descriptive statistics for numeric columns")
-    st.write(df.describe())
-
-    # -------------------------
-    # Placeholder for Day 2
-    # -------------------------
-    # df = utils.clean_data(df)
-
-    st.subheader("missing values in each column")
-    st.write(df.isnull().sum())
-
-    st.subheader("Before Cleaning")
-    st.write(df)
-
     df_clean = utils.clean_data(df)
 
-    st.subheader("After Cleaning")
-    st.write(df_clean)
+    # -------------------------
+    # 📊 VISUALS
+    # -------------------------
+    st.divider()
+    st.subheader("📊 Visual Insights")
 
-# Day 3: Data Visualization with Pandas + Streamlit
-    st.subheader("Numeric Column Distribution")
-    column = st.selectbox("Choose column", df.select_dtypes(include='number').columns)
+    numeric_cols = df.select_dtypes(include='number').columns
 
-    st.bar_chart(df[column].value_counts())
+    if len(numeric_cols) > 0:
+        column = st.selectbox("Choose a numeric column", numeric_cols)
+        st.bar_chart(df[column].value_counts())
+    else:
+        st.info("No numeric columns available for visualization.")
 
+    # -------------------------
+    # 🧠 INSIGHTS
+    # -------------------------
+    st.divider()
+    st.subheader("🧠 Key Insights")
 
-    # Step 2: Add basic insights
-    st.subheader("QuickInsights")
-    st.write("shape of the data: ", df.shape)
-    st.write("missing values:")
-    st.write(df.isnull().sum())
+    # Missing values
+    missing = df.isnull().sum()
+    if missing.sum() > 0:
+        st.warning("Some columns contain missing values.")
+        st.write(missing[missing > 0])
+    else:
+        st.success("No missing values detected.")
 
-# Step 3: Add correlation (important DS skill)
-  
-    st.subheader("Correlation Heatmap")
+    # Skewness + Outliers
+    for col in numeric_cols:
 
-    corr = df.corr(numeric_only=True)
+        st.write(f"### {col}")
 
-    fig, ax = plt.subplots()
-    sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax)
-
-    st.pyplot(fig)
-
-# Step 4: Automatic insights (bonus for Day 4)
-    st.subheader("📊 Automatic Data Analysis")
-
-    for col in df.columns:
-
-     st.write(f"### {col}")
-
-    # CATEGORICAL
-    if df[col].dtype == "object":
-        st.bar_chart(df[col].value_counts().head(10))
-
-    # NUMERIC
-    if pd.api.types.is_numeric_dtype(df[col]):
-
+        # Histogram
         fig, ax = plt.subplots()
-    ax.hist(df[col].dropna(), bins=20)
-    st.pyplot(fig)
+        ax.hist(df[col].dropna(), bins=20)
+        st.pyplot(fig)
 
-    # Skewness
-    skew = df[col].skew()
+        # Skewness
+        skew = df[col].skew()
 
-    if skew > 1:
-        st.write(f"📈 {col} is right-skewed")
-    elif skew < -1:
-        st.write(f"📉 {col} is left-skewed")
-    else:
-        st.write(f"✅ {col} is fairly balanced")
+        if skew > 1:
+            st.warning("This column is highly unbalanced (skewed to one side).")
+        elif skew < -1:
+            st.warning("This column is highly unbalanced in the opposite direction.")
+        else:
+            st.success("This column is fairly balanced.")
 
-    # 🔥 OUTLIERS
-    Q1 = df[col].quantile(0.25)
-    Q3 = df[col].quantile(0.75)
-    IQR = Q3 - Q1
+        # Outliers
+        Q1 = df[col].quantile(0.25)
+        Q3 = df[col].quantile(0.75)
+        IQR = Q3 - Q1
 
-    outliers = df[(df[col] < Q1 - 1.5 * IQR) | (df[col] > Q3 + 1.5 * IQR)]
+        outliers = df[(df[col] < Q1 - 1.5 * IQR) | (df[col] > Q3 + 1.5 * IQR)]
 
-    if len(outliers) > 0:
-        st.write(f"⚠️ {col} has {len(outliers)} possible outliers")
-    else:
-        st.write(f"✅ {col} has no significant outliers")
-    # STEP 3 — Smart Correlation Insight 🔥
-    st.subheader("🧠 Correlation Insights (Clean)")
+        if len(outliers) > 0:
+            st.warning(f"{len(outliers)} potential outliers detected.")
+        else:
+            st.success("No significant outliers detected.")
 
-    st.write("Looking for strong relationships between variables...")
+    # -------------------------
+    # 🔗 RELATIONSHIPS
+    # -------------------------
+    st.divider()
+    st.subheader("🔗 Relationships Between Variables")
 
     corr = df_clean.corr(numeric_only=True)
 
-    found = False
+    if not corr.empty:
 
-    for i in range(len(corr.columns)):
-        for j in range(i + 1, len(corr.columns)):
-            value = corr.iloc[i, j]
+        fig, ax = plt.subplots()
+        sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax)
+        st.pyplot(fig)
 
-            if abs(value) > 0.7:
-                found = True
+        st.subheader("🧠 Correlation Insights")
 
-                col1 = corr.columns[i]
-                col2 = corr.columns[j]
+        found = False
 
-                if value > 0.7:
-                    st.write(f"📈 {col1} and {col2} have strong positive correlation ({value:.2f})")
-                elif value < -0.7:
-                    st.write(f"📉 {col1} and {col2} have strong negative correlation ({value:.2f})")
+        for i in range(len(corr.columns)):
+            for j in range(i + 1, len(corr.columns)):
+                value = corr.iloc[i, j]
 
-    if not found:
-        st.write("No strong correlations found")
+                if abs(value) > 0.7:
+                    found = True
+
+                    col1 = corr.columns[i]
+                    col2 = corr.columns[j]
+
+                    if value > 0:
+                        st.info(f"{col1} and {col2} move together strongly.")
+                    else:
+                        st.info(f"{col1} and {col2} move in opposite directions strongly.")
+
+        if not found:
+            st.success("No strong relationships detected.")
+
+    else:
+        st.info("Not enough numeric data for correlation analysis.")
