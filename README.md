@@ -1,31 +1,70 @@
-# 🧠 AI Data Analyst App (Streamlit + Python)
+# 📊 AI Data Analyst App
 
-An interactive data analysis and cleaning app built with Python and Streamlit.
+An interactive data analysis web app built with Python and Streamlit.
 
-This project helps users upload CSV files, explore data, clean it, and generate insights easily — even without coding knowledge.
+This tool allows users to upload any CSV dataset and instantly get **clean, human-friendly insights**, visualizations, and data summaries — without needing coding skills.
 
 ---
 
 ## 🚀 Features
 
-- 📂 Upload CSV files
-- 👀 Preview dataset (first rows)
-- 📊 View dataset information (columns, types, missing values)
-- 📈 Descriptive statistics
-- 🧹 Data cleaning:
-  - Remove duplicates
-  - Handle missing values (mean imputation)
-- 🔁 Before / After comparison
-- ⚡ Clean and simple UI using Streamlit
+* 📁 Upload any CSV file
+* 📌 Quick data overview (rows, columns, preview)
+* 📊 Automatic visualizations for numeric data
+* 🧠 Human-readable insights (no technical jargon)
+* ⚠️ Missing values detection
+* 📈 Distribution analysis (skewness, outliers)
+* 🔗 Correlation analysis between variables
+* 🧹 Automatic data cleaning
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠 Tech Stack
 
-- Python 🐍
-- Pandas 📊
-- Streamlit 🎈
+* Python
+* Pandas
+* Streamlit
+* Matplotlib
+* Seaborn
 
 ---
 
-## 📁 Project Structure
+## ▶️ How to Run the App
+
+```bash
+git clone https://github.com/your-username/your-repo-name.git
+cd your-repo-name
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+---
+
+## 📷 Screenshots
+
+(Add screenshots here after running the app)
+
+---
+
+## 💡 Use Case
+
+This app is designed for:
+
+* Beginners exploring data
+* Quick dataset analysis
+* Non-technical users who want simple insights
+
+---
+
+## 📌 Future Improvements
+
+* Support for Excel files
+* Advanced analytics (ML models)
+* Export reports
+
+---
+
+## 👨‍💻 Author
+
+Your Name
+SIVASUTHAN Manojan
